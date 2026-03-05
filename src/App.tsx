@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { CartProvider } from "@/context/CartContext";
 import { OrderProvider } from "@/context/OrderContext";
 import { AdminProvider } from "@/context/AdminContext";
+import { ThemeProvider } from "@/context/ThemeContext";
 import Index from "./pages/Index";
 import CartPage from "./pages/CartPage";
 import CheckoutPage from "./pages/CheckoutPage";
@@ -22,31 +23,33 @@ const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <CartProvider>
-        <OrderProvider>
-          <AdminProvider>
-            <Toaster />
-            <Sonner />
-            <BrowserRouter>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/cart" element={<CartPage />} />
-                <Route path="/checkout" element={<CheckoutPage />} />
-                <Route path="/order-success/:orderId" element={<OrderSuccessPage />} />
-                <Route path="/track" element={<OrderTrackingPage />} />
-                <Route path="/admin" element={<AdminLoginPage />} />
-                <Route path="/admin/dashboard" element={<AdminDashboard />} />
-                <Route path="/admin/orders" element={<AdminOrdersPage />} />
-                <Route path="/admin/products" element={<AdminProductsPage />} />
-                <Route path="/admin/credits" element={<AdminCreditsPage />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </BrowserRouter>
-          </AdminProvider>
-        </OrderProvider>
-      </CartProvider>
-    </TooltipProvider>
+    <ThemeProvider>
+      <TooltipProvider>
+        <CartProvider>
+          <OrderProvider>
+            <AdminProvider>
+              <Toaster />
+              <Sonner />
+              <BrowserRouter>
+                <Routes>
+                  <Route path="/" element={<Index />} />
+                  <Route path="/cart" element={<CartPage />} />
+                  <Route path="/checkout" element={<CheckoutPage />} />
+                  <Route path="/order-success/:orderId" element={<OrderSuccessPage />} />
+                  <Route path="/track" element={<OrderTrackingPage />} />
+                  <Route path="/admin" element={<AdminLoginPage />} />
+                  <Route path="/admin/dashboard" element={<AdminDashboard />} />
+                  <Route path="/admin/orders" element={<AdminOrdersPage />} />
+                  <Route path="/admin/products" element={<AdminProductsPage />} />
+                  <Route path="/admin/credits" element={<AdminCreditsPage />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </BrowserRouter>
+            </AdminProvider>
+          </OrderProvider>
+        </CartProvider>
+      </TooltipProvider>
+    </ThemeProvider>
   </QueryClientProvider>
 );
 

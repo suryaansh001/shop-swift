@@ -2,9 +2,9 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useCart } from "@/context/CartContext";
 import { useOrders } from "@/context/OrderContext";
-import { Upload, QrCode } from "lucide-react";
+import { Upload, QrCode, Smartphone, Copy, Check } from "lucide-react";
 import Navbar from "@/components/Navbar";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 const CheckoutPage = () => {
   const { items, totalAmount, clearCart } = useCart();
@@ -14,6 +14,10 @@ const CheckoutPage = () => {
   const [form, setForm] = useState({ name: "", email: "", phone: "", address: "" });
   const [screenshot, setScreenshot] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const upiId = import.meta.env.VITE_UPI_ID || "";
+  const storeName = import.meta.env.VITE_STORE_NAME || "Sharma Electrical Supplies";
 
   const handleFile = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -47,6 +51,25 @@ const CheckoutPage = () => {
 
     clearCart();
     setTimeout(() => navigate(`/order-success/${orderId}`), 500);
+  };
+
+  const orderRef = `ORD${Date.now().toString().slice(-6)}`;
+
+  const openUpiApp = () => {
+    const upiUrl = [
+      `upi://pay?pa=${encodeURIComponent(upiId)}`,
+      `&pn=${encodeURIComponent(storeName)}`,
+      `&am=${totalAmount}`,
+      `&cu=INR`,
+      `&tn=${encodeURIComponent(`Order-${orderRef}`)}`,
+    ].join("");
+    window.location.href = upiUrl;
+  };
+
+  const copyUpiId = async () => {
+    await navigator.clipboard.writeText(upiId);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
   };
 
   if (items.length === 0) {
@@ -106,7 +129,54 @@ const CheckoutPage = () => {
                 <span className="text-xs text-muted-foreground">Amount to pay</span>
                 <p className="text-2xl font-bold text-primary">₹{totalAmount.toLocaleString("en-IN")}</p>
               </div>
+
+              {/* UPI Pay button */}
+              {upiId && (
+                <div className="w-full flex flex-col gap-3">
+                  <motion.button
+                    type="button"
+                    onClick={openUpiApp}
+                    whileTap={{ scale: 0.97 }}
+                    whileHover={{ scale: 1.01 }}
+                    className="flex w-full items-center justify-center gap-3 rounded-2xl px-6 py-4 text-sm font-semibold text-white
+                      bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600
+                      shadow-[0_4px_24px_0px_rgba(124,58,237,0.4)]
+                      hover:shadow-[0_6px_32px_0px_rgba(124,58,237,0.55)]
+                      transition-all duration-300"
+                  >
+                    <Smartphone className="h-5 w-5" />
+                    Open UPI App to Pay
+                  </motion.button>
+
+                  {/* UPI ID + copy */}
+                  <div className="flex items-center justify-between rounded-xl bg-muted/50 border border-border px-4 py-2.5">
+                    <div>
+                      <p className="text-[10px] text-muted-foreground mb-0.5">UPI ID</p>
+                      <p className="text-sm font-mono font-medium text-foreground">{upiId}</p>
+                    </div>
+                    <motion.button
+                      type="button"
+                      onClick={copyUpiId}
+                      whileTap={{ scale: 0.9 }}
+                      className="flex items-center gap-1.5 rounded-lg bg-secondary px-3 py-1.5 text-xs font-medium text-secondary-foreground transition-colors hover:bg-muted"
+                    >
+                      <AnimatePresence mode="wait" initial={false}>
+                        {copied ? (
+                          <motion.span key="check" initial={{ scale: 0.7, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.7, opacity: 0 }} className="flex items-center gap-1 text-green-500">
+                            <Check className="h-3.5 w-3.5" /> Copied!
+                          </motion.span>
+                        ) : (
+                          <motion.span key="copy" initial={{ scale: 0.7, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ scale: 0.7, opacity: 0 }} className="flex items-center gap-1">
+                            <Copy className="h-3.5 w-3.5" /> Copy
+                          </motion.span>
+                        )}
+                      </AnimatePresence>
+                    </motion.button>
+                  </div>
+                </div>
+              )}
             </div>
+
 
             <div>
               <label className="text-xs font-medium text-muted-foreground mb-1 block">Upload Payment Screenshot</label>

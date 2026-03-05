@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
 import { useAdmin } from "@/context/AdminContext";
 import { Lock, Zap } from "lucide-react";
 import { motion } from "framer-motion";
@@ -12,8 +12,7 @@ const AdminLoginPage = () => {
   const navigate = useNavigate();
 
   if (isAuthenticated) {
-    navigate("/admin/dashboard");
-    return null;
+    return <Navigate to="/admin/dashboard" replace />;
   }
 
   const handleSubmit = (e: React.FormEvent) => {
